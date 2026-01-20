@@ -1,0 +1,29 @@
+# Build artifacts
+build/
+sdkconfig.old
+*.o
+*.a
+*.so
+*.elf
+*.bin
+*.map
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# ESP-IDF
+dependencies.lock
+managed_components/
+
+# Temporary files
+*.log
+*.tmp
