@@ -16,8 +16,8 @@ A complete, end-to-end autonomous robotics project built on an ESP32 microcontro
 * **Motor Driver:** TB6612FNG (Requires 12V Battery on `VMOT`)
 * **Sensors:** 
   * VL53L0X Time-of-Flight (ToF) Distance Sensor
-  * MPU6050 6-DOF IMU
-  * 2x Quadrature Wheel Encoders (DC Motors)
+  * HW-290 GY-87 10-DOF IMU (MPU6050 + HMC5883L + BMP180)
+  * 2x Rhino GB37 12V 20Kgcm Geared Encoder Motors
 * **Power:** 12V LiPo Battery for Motors, 5V Logic Power.
 
 ---
@@ -83,4 +83,4 @@ Use `i`, `,`, `j`, `l`, and `k` to drive the robot around. As you move, SLAM wil
 
 ---
 
-*For an in-depth breakdown of the project architecture, hardware pins, node graphs, and troubleshooting steps, please read [PROJECT_DETAILS.md](PROJECT_DETAILS.md).*
+*For an in-depth breakdown of the project architecture, hardware pins, node graphs, kinematic math, and an exhaustive troubleshooting narrative, please read [COMPREHENSIVE_GUIDE.md](COMPREHENSIVE_GUIDE.md).*
