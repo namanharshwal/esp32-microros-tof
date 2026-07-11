@@ -32,18 +32,29 @@ A complete, end-to-end autonomous robotics project built on an ESP32 microcontro
 
 ## ⚙️ Quick Start Guide
 
-### 1. Build and Flash the ESP32
-Ensure the ESP32 is plugged in via USB and the 12V battery is disconnected during flashing.
+### 1. Configure the ESP32 (Wi-Fi & Agent IP)
+Before building, you must configure the ESP32 to connect to your local Wi-Fi and point it to the Micro-ROS Agent's IP address.
+
 ```bash
 # Source the ESP-IDF v5.1 environment
 . ~/esp/esp-idf-v5.1/export.sh
 
-# Navigate to the project
 cd ~/tof_microros_project
 
-# Build, flash, and monitor
+# Open the configuration menu
+idf.py menuconfig
+```
+* **Wi-Fi Setup:** Go to `micro-ROS Configuration` -> `WiFi Configuration` and enter your SSID and Password.
+* **Agent IP:** Go to `micro-ROS Configuration` -> `micro-ROS Agent IP` and enter the IP address of your host computer (e.g., `10.42.0.1`). Save (S) and Quit (Q).
+
+### 2. Build and Flash the ESP32 DevKit
+Ensure the ESP32 is plugged in via USB and the **12V battery is disconnected** during flashing to prevent power surges.
+
+```bash
+# Build, flash, and open the serial monitor
 idf.py build flash monitor
 ```
+*🛑 **DevKit Note:** If you see `Connecting...` stalling during upload, press and hold the **BOOT** button on your ESP32 DevKit until the upload begins.*
 
 ### 2. Clean Environment (Recommended)
 Before launching, ensure there are no "zombie" ROS 2 processes running from previous sessions that could cause TF (Transform) conflicts in RViz.
