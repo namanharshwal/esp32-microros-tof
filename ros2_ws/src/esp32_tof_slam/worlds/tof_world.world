@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <world name="tof_robot_world">
+
+    <include><uri>model://ground_plane</uri></include>
+    <include><uri>model://sun</uri></include>
+
+    <!-- Surrounding walls -->
+    <model name="wall_north">
+      <static>true</static>
+      <pose>0 3 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6 0.1 1</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6 0.1 1</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_south">
+      <static>true</static>
+      <pose>0 -3 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>6 0.1 1</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>6 0.1 1</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_east">
+      <static>true</static>
+      <pose>3 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.1 6 1</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.1 6 1</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <model name="wall_west">
+      <static>true</static>
+      <pose>-3 0 0.5 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.1 6 1</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.1 6 1</size></box></geometry>
+          <material><ambient>0.5 0.5 0.5 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- Internal obstacle box -->
+    <model name="obstacle_box">
+      <static>true</static>
+      <pose>1.5 0 0.25 0 0 0</pose>
+      <link name="link">
+        <collision name="col"><geometry><box><size>0.3 0.3 0.5</size></box></geometry></collision>
+        <visual name="vis"><geometry><box><size>0.3 0.3 0.5</size></box></geometry>
+          <material><ambient>0.8 0.2 0.2 1</ambient></material></visual>
+      </link>
+    </model>
+
+    <!-- Robot spawned at origin -->
+    <gui fullscreen="0">
+      <camera name="user_camera">
+        <pose>0 -5 3 0 0.5 1.57</pose>
+      </camera>
+    </gui>
+
+  </world>
+</sdf>
