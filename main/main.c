@@ -399,12 +399,21 @@ static void motors_set(float left, float right) {
     uint16_t pwr = (fabsf(right) < 0.05f) ? 0
                  : (uint16_t)fmap(fabsf(right), 0, 1, PWM_MIN, PWM_MAX);
 
-    if      (left  >  0.05f) { gpio_set_level(PIN_IN1, 1); gpio_set_level(PIN_IN2, 0); }
-    else if (left  < -0.05f) { gpio_set_level(PIN_IN1, 0); gpio_set_level(PIN_IN2, 1); }
+    // ====================================================================================
+    // [DOCUMENTATION: REVERSED MOTOR POLARITY FIX]
+    // Problem: When commanded to move FORWARD, the physical robot was moving BACKWARD.
+    // Diagnosis: Both physical DC gear motors were wired backwards relative to the chassis front.
+    // Solution: Instead of resoldering the hardware, we inverted the H-Bridge logic here.
+    // Standard forward logic is IN1=1, IN2=0. We use IN1=0, IN2=1 to reverse the physical rotation.
+    // ====================================================================================
+    if      (left  >  0.05f) { gpio_set_level(PIN_IN1, 0); gpio_set_level(PIN_IN2, 1); }
+    else if (left  < -0.05f) { gpio_set_level(PIN_IN1, 1); gpio_set_level(PIN_IN2, 0); }
     else                     { gpio_set_level(PIN_IN1, 0); gpio_set_level(PIN_IN2, 0); }
 
-    if      (right >  0.05f) { gpio_set_level(PIN_IN3, 1); gpio_set_level(PIN_IN4, 0); }
-    else if (right < -0.05f) { gpio_set_level(PIN_IN3, 0); gpio_set_level(PIN_IN4, 1); }
+    // Applying the same inversion for the Right Motor.
+    // right > 0.05f (Forward command) now sets IN3=0, IN4=1.
+    if      (right >  0.05f) { gpio_set_level(PIN_IN3, 0); gpio_set_level(PIN_IN4, 1); }
+    else if (right < -0.05f) { gpio_set_level(PIN_IN3, 1); gpio_set_level(PIN_IN4, 0); }
     else                     { gpio_set_level(PIN_IN3, 0); gpio_set_level(PIN_IN4, 0); }
 
     ledc_set_duty(PWM_MODE, PWM_CH_L, pwl); ledc_update_duty(PWM_MODE, PWM_CH_L);
@@ -514,6 +523,16 @@ static void micro_ros_task(void *arg) {
     rcl_node_t node = rcl_get_zero_initialized_node();
     RCCHECK(rclc_node_init_default(&node, "esp32_robot", "", &support));
 
+    // ====================================================================================
+    // [DOCUMENTATION: MICRO-ROS CONNECTION & TOPIC ARCHITECTURE]
+    // This section registers the ESP32 as a native node on the ROS 2 graph over UDP Wi-Fi.
+    // 
+    // PUBLISHERS (Data flowing from ESP32 -> Host PC):
+    // 1. /tof_distance : Single-point laser distance (in mm). Host converts this to a 2D LaserScan.
+    // 2. /imu/data     : Gyro/Accel data. Host uses this in the EKF for rotational SLAM stability.
+    // 3. /left_ticks   : Raw quadrature encoder counts for the left wheel.
+    // 4. /right_ticks  : Raw quadrature encoder counts for the right wheel.
+    // ====================================================================================
     rcl_publisher_t tof_pub   = rcl_get_zero_initialized_publisher();
     rcl_publisher_t imu_pub   = rcl_get_zero_initialized_publisher();
     rcl_publisher_t left_pub  = rcl_get_zero_initialized_publisher();
@@ -528,6 +547,11 @@ static void micro_ros_task(void *arg) {
     RCCHECK(rclc_publisher_init_default(&right_pub, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs,    msg, Int32), "right_ticks"));
 
+    // ====================================================================================
+    // SUBSCRIBERS (Data flowing from Host PC -> ESP32):
+    // 1. /cmd_vel : A geometry_msgs/Twist message representing desired linear and angular velocity.
+    //               The 'cmd_vel_callback' function catches this and calls 'motors_set()'.
+    // ====================================================================================
     rcl_subscription_t cmd_sub = rcl_get_zero_initialized_subscription();
     RCCHECK(rclc_subscription_init_default(&cmd_sub, &node,
         ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist), "cmd_vel"));
